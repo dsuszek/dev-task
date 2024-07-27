@@ -1,5 +1,6 @@
 package com.example.stars.controller;
 
+import com.example.stars.exception.NoStarsAvailableException;
 import com.example.stars.exception.StarNotFoundException;
 import com.example.stars.model.Star;
 import com.example.stars.service.StarService;
@@ -11,7 +12,14 @@ import java.util.*;
 
 /**
  * REST controller for managing stars.
- * Provides endpoints for CRUD operations and additional functionalities related to stars.
+ * Provides endpoints for CRUD operations
+ * and additional functionalities defined in the 3rd step of the task:
+ * <ul>
+ * <li>findClosestStar</li>
+ * <li>getNumberOfStarsByDistances</li>
+ * <li>getUniqueStars</li>
+ * </ul>
+
  */
 
 @RestController
@@ -22,7 +30,7 @@ public class StarController {
     private StarService starService;
 
     /**
-     * Retrieve a star by its ID.
+     * Retrieves a star by its ID.
      *
      * @param id the ID of the star to retrieve
      * @return a ResponseEntity containing the star if found, otherwise throws a StarNotFoundException
@@ -35,7 +43,7 @@ public class StarController {
     }
 
     /**
-     * Create a new star.
+     * Creates a new star.
      *
      * @param star the star object to be created
      * @return a ResponseEntity containing the created star
@@ -47,7 +55,7 @@ public class StarController {
     }
 
     /**
-     * Update an existing star.
+     * Updates an existing star.
      *
      * @param id the ID of the star to update
      * @param starDetails the new details for the star
@@ -64,7 +72,7 @@ public class StarController {
     }
 
     /**
-     * Delete a star by its ID.
+     * Deletes a star by its ID.
      *
      * @param id the ID of the star to delete
      * @return a ResponseEntity with status 200 OK if the star was deleted, otherwise throws a StarNotFoundException
@@ -78,7 +86,7 @@ public class StarController {
     }
 
     /**
-     * Find the closest stars based on distance.
+     * Finds the closest stars based on distance.
      *
      * @param size the number of closest stars to retrieve
      * @return a ResponseEntity containing a list of the closest stars
@@ -86,30 +94,39 @@ public class StarController {
     @GetMapping("/closest")
     public ResponseEntity<List<Star>> findClosestStar(@RequestParam int size) {
         List<Star> allStars = starService.findAllStars();
-        List<Star> closestStars = starService.findClosestStar(allStars, size);
+        if (allStars.isEmpty()) {
+            throw new NoStarsAvailableException("List of stars is null or empty");
+        }
+        List<Star> closestStars = starService.findClosestStars(allStars, size);
         return ResponseEntity.ok(closestStars);
     }
 
     /**
-     * Get the number of stars by their distances.
+     * Gets the number of stars by their distances.
      *
      * @return a ResponseEntity containing a map where the key is the distance and the value is the number of stars at that distance
      */
     @GetMapping("/distances")
     public ResponseEntity<Map<Long, Integer>> getNumberOfStarsByDistances() {
         List<Star> allStars = starService.findAllStars();
+        if (allStars.isEmpty()) {
+            throw new NoStarsAvailableException("List of stars is null or empty");
+        }
         Map<Long, Integer> result = starService.getNumberOfStarsByDistances(allStars);
         return ResponseEntity.ok(result);
     }
 
     /**
-     * Get a collection of unique stars.
+     * Gets a collection of unique stars.
      *
      * @return a ResponseEntity containing a collection of stars with unique names
      */
     @GetMapping("/unique")
     public ResponseEntity<Collection<Star>> getUniqueStars() {
         List<Star> allStars = starService.findAllStars();
+        if (allStars.isEmpty()) {
+            throw new NoStarsAvailableException("List of stars is null or empty");
+        }
         Collection<Star> uniqueStars = starService.getUniqueStars(allStars);
         return ResponseEntity.ok(uniqueStars);
     }

@@ -20,7 +20,7 @@ public class StarServiceTest {
                 new Star("StarE", 3)
         );
 
-        List<Star> closestStars = service.findClosestStar(stars, 3);
+        List<Star> closestStars = service.findClosestStars(stars, 3);
         assertEquals(3, closestStars.size());
         assertEquals("StarE", closestStars.get(0).getName());
         assertEquals("StarB", closestStars.get(1).getName());
